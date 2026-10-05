@@ -24,7 +24,7 @@ services:
       - PORT=3001
       - CORS_ORIGIN=${CORS_ORIGIN}
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     volumes:
       - ./uploads:/app/uploads
     networks:
@@ -37,7 +37,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     networks:
       - domfeliu_network
 
