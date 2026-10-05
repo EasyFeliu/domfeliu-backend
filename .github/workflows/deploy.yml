@@ -52,8 +52,28 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add VPS to known hosts
-        run: ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+      # The VPS host keys are pinned instead of fetched with ssh-keyscan on
+      # every run: a fetched key is trusted blindly, and the VPS fail2ban bans
+      # the runner for the pre-auth connections ssh-keyscan opens.
+      # Fingerprints (check on the VPS with ssh-keygen -lf /etc/ssh/ssh_host_*_key.pub):
+      #   ED25519 SHA256:O61GIPvrJ4IR8IZG8Vd+uBWdBEF/FHKxiijwVrWObgo
+      #   ECDSA   SHA256:PfzRK+BFbJz9pac3zDQd+wgeIt0UGqGQiIsS+UcS00s
+      - name: Pin the VPS host keys
+        env:
+          VPS_IP: ${{ secrets.VPS_IP }}
+        run: |
+          mkdir -p ~/.ssh
+          {
+            echo "$VPS_IP ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFQH0Vd+v4URnvsJCr7PCo6qEDxv2PxLGUvJf2Hjefch"
+            echo "$VPS_IP ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNediJ7b7unHRFItTtASa6IUqYGWTyiOTz/m05pEG3ZJlAVTfFncg88gCuoRhBkysFSNn02fFBSpmulygNUN+dA="
+          } > ~/.ssh/known_hosts
+          {
+            echo "Host *"
+            echo "  StrictHostKeyChecking yes"
+            echo "  BatchMode yes"
+            echo "  ConnectTimeout 20"
+          } > ~/.ssh/config
+          chmod 600 ~/.ssh/known_hosts ~/.ssh/config
 
       - name: Copy orchestration files to VPS
         run: |
