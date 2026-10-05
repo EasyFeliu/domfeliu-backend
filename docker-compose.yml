@@ -13,7 +13,7 @@ services:
       - domfeliu_network
 
   domfeliu_api:
-    image: ghcr.io/shadyfeliu/domfeliu-backend:main
+    image: ghcr.io/easyfeliu/domfeliu-backend:main
     container_name: domfeliu_api
     restart: always
     depends_on:
@@ -31,7 +31,7 @@ services:
       - domfeliu_network
 
   domfeliu_web:
-    image: ghcr.io/shadyfeliu/domfeliu-frontend:main
+    image: ghcr.io/easyfeliu/domfeliu-frontend:main
     container_name: domfeliu_web
     restart: always
     environment:
